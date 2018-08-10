@@ -158,7 +158,6 @@ public class NavigationBarSettings extends SettingsPreferenceFragment implements
 
     private void updateBarVisibleAndUpdatePrefs(boolean showing) {
         mNavbarVisibility.setChecked(showing);
-        mGestureNavigation.setChecked(!showing);
         mGestureNavigation.setEnabled(!showing);
         mNavInterface.setEnabled(mNavbarVisibility.isChecked());
         mNavGeneral.setEnabled(mNavbarVisibility.isChecked());
@@ -166,10 +165,9 @@ public class NavigationBarSettings extends SettingsPreferenceFragment implements
 
     private void updateGestures(boolean showing) {
         mGestureNavigation.setChecked(showing);
-        mNavbarVisibility.setChecked(!showing);
         mNavbarVisibility.setEnabled(!showing);
-        mNavInterface.setEnabled(mNavbarVisibility.isChecked());
-        mNavGeneral.setEnabled(mNavbarVisibility.isChecked());
+        mNavInterface.setEnabled(mNavbarVisibility.isEnabled());
+        mNavGeneral.setEnabled(mNavbarVisibility.isEnabled());
     }
 
     @Override
@@ -184,16 +182,12 @@ public class NavigationBarSettings extends SettingsPreferenceFragment implements
             boolean showing = ((Boolean)newValue);
             Settings.Secure.putInt(getContentResolver(), Settings.Secure.NAVIGATION_BAR_VISIBLE,
                     showing ? 1 : 0);
-            Settings.System.putInt(getContentResolver(), Settings.System.USE_BOTTOM_GESTURE_NAVIGATION,
-                    showing ? 0 : 1);
             updateBarVisibleAndUpdatePrefs(showing);
             return true;
         } else if (preference == mGestureNavigation) {
             boolean showing = ((Boolean)newValue);
             Settings.System.putInt(getContentResolver(), Settings.System.USE_BOTTOM_GESTURE_NAVIGATION,
                     showing ? 1 : 0);
-            Settings.Secure.putInt(getContentResolver(), Settings.Secure.NAVIGATION_BAR_VISIBLE,
-                    showing ? 0 : 1);
             updateGestures(showing);
             return true;
         } else if (preference == mBarHeightPort) {
