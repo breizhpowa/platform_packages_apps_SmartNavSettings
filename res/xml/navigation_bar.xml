@@ -22,11 +22,34 @@
         android:key="navbar_visibility"
         android:title="@string/navbar_visibility" />
 
-    <com.aosip.owlsnest.preference.SystemSettingSwitchPreference
-        android:key="use_bottom_gesture_navigation"
-        android:title="@string/use_bottom_gesture_title"
-        android:summary="@string/use_bottom_gesture_summary"
-        android:defaultValue="false" />
+    <PreferenceCategory
+        android:key="category_gesture_interface"
+        android:title="@string/gesture_interface_title" >
+
+        <com.aosip.owlsnest.preference.SystemSettingSwitchPreference
+            android:key="use_bottom_gesture_navigation"
+            android:title="@string/use_bottom_gesture_title"
+            android:summary="@string/use_bottom_gesture_summary"
+            android:defaultValue="false" />
+
+       <com.aosip.owlsnest.preference.CustomSeekBarPreference
+            android:key="gesture_swipe_length"
+            android:title="@string/gesture_swipe_length_title"
+            android:summary="@string/gesture_swipe_length_summary"
+            android:persistent="false"
+            settings:units="px"
+            android:dependency="use_bottom_gesture_navigation" />
+
+       <com.aosip.owlsnest.preference.CustomSeekBarPreference
+            android:key="gesture_swipe_timeout"
+            android:title="@string/gesture_action_timeout_title"
+            android:summary="@string/gesture_action_timeout_summary"
+            android:max="500"
+            settings:min="100"
+            android:persistent="false"
+            settings:units="ms"
+            android:dependency="use_bottom_gesture_navigation" />
+    </PreferenceCategory>
 
     <PreferenceCategory
         android:key="category_navbar_interface"

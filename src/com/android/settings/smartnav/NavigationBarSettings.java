@@ -31,6 +31,8 @@ import android.support.v7.preference.PreferenceCategory;
 import android.support.v7.preference.PreferenceScreen;
 import android.support.v7.preference.Preference.OnPreferenceChangeListener;
 import android.provider.Settings;
+import android.util.DisplayMetrics;
+import android.util.TypedValue;
 
 import com.android.settings.SettingsPreferenceFragment;
 import com.aosip.owlsnest.preference.CustomSeekBarPreference;
@@ -56,7 +58,11 @@ public class NavigationBarSettings extends SettingsPreferenceFragment implements
     private static final String KEY_NAVIGATION_HEIGHT_LAND = "navbar_height_landscape";
     private static final String KEY_NAVIGATION_WIDTH = "navbar_width";
     private static final String KEY_PULSE_SETTINGS = "pulse_settings";
+    private static final String KEY_SWIPE_LENGTH = "gesture_swipe_length";
+    private static final String KEY_SWIPE_TIMEOUT = "gesture_swipe_timeout";
 
+    private CustomSeekBarPreference mSwipeTriggerLength;
+    private CustomSeekBarPreference mSwipeTriggerTimeout;
     private SwitchPreference mNavbarVisibility;
     private SystemSettingSwitchPreference mGestureNavigation;
     private ListPreference mNavbarMode;
@@ -107,6 +113,23 @@ public class NavigationBarSettings extends SettingsPreferenceFragment implements
         mBarHeightPort = (CustomSeekBarPreference) findPreference(KEY_NAVIGATION_HEIGHT_PORT);
         mBarHeightPort.setValue(size);
         mBarHeightPort.setOnPreferenceChangeListener(this);
+
+        mSwipeTriggerLength = (CustomSeekBarPreference) findPreference(KEY_SWIPE_LENGTH);
+        int value = Settings.System.getInt(getContentResolver(),
+                Settings.System.BOTTOM_GESTURE_SWIPE_LIMIT,
+                getSwipeLengthInPixel(getResources().getInteger(com.android.internal.R.integer.nav_gesture_swipe_min_length)));
+
+        mSwipeTriggerLength.setMin(getSwipeLengthInPixel(40));
+        mSwipeTriggerLength.setMax(getSwipeLengthInPixel(80));
+        mSwipeTriggerLength.setValue(value);
+        mSwipeTriggerLength.setOnPreferenceChangeListener(this);
+
+        mSwipeTriggerTimeout = (CustomSeekBarPreference) findPreference(KEY_SWIPE_TIMEOUT);
+        value = Settings.System.getInt(getContentResolver(),
+                Settings.System.BOTTOM_GESTURE_TRIGGER_TIMEOUT,
+                getResources().getInteger(com.android.internal.R.integer.nav_gesture_swipe_timout));
+        mSwipeTriggerTimeout.setValue(value);
+        mSwipeTriggerTimeout.setOnPreferenceChangeListener(this);
 
         final boolean canMove = ActionUtils.navigationBarCanMove();
         if (canMove) {
@@ -170,6 +193,10 @@ public class NavigationBarSettings extends SettingsPreferenceFragment implements
         mNavGeneral.setEnabled(mNavbarVisibility.isEnabled());
     }
 
+    private int getSwipeLengthInPixel(int value) {
+        return Math.round(value * getResources().getDisplayMetrics().density);
+    }
+
     @Override
     public boolean onPreferenceChange(Preference preference, Object newValue) {
         if (preference.equals(mNavbarMode)) {
@@ -204,6 +231,16 @@ public class NavigationBarSettings extends SettingsPreferenceFragment implements
             int val = (Integer) newValue;
             Settings.Secure.putIntForUser(getContentResolver(),
                     Settings.Secure.NAVIGATION_BAR_WIDTH, val, UserHandle.USER_CURRENT);
+            return true;
+        } else if (preference == mSwipeTriggerLength) {
+            int value = (Integer) newValue;
+            Settings.System.putIntForUser(getContentResolver(),
+                    Settings.System.BOTTOM_GESTURE_SWIPE_LIMIT, value, UserHandle.USER_CURRENT);
+            return true;
+        } else if (preference == mSwipeTriggerTimeout) {
+            int value = (Integer) newValue;
+            Settings.System.putIntForUser(getContentResolver(),
+                    Settings.System.BOTTOM_GESTURE_TRIGGER_TIMEOUT, value, UserHandle.USER_CURRENT);
             return true;
         }
         return false;
