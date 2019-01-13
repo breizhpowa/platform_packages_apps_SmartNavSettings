@@ -80,6 +80,7 @@ public class NavigationBarSettings extends SettingsPreferenceFragment implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.navigation_bar);
+        getActivity().getActionBar().setTitle(R.string.bottom_nav_navigation_title);
 
         mNavInterface = (PreferenceCategory) findPreference(KEY_CATEGORY_NAVIGATION_INTERFACE);
         mGestureNavigation = (SystemSettingSwitchPreference) findPreference(KEY_GESTURE_NAVIGATION);
